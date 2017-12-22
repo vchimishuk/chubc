@@ -73,6 +73,9 @@ func main() {
 		fatal("invalid parameters: %s", err)
 	}
 
+	if len(args) == 0 {
+		fatal("missing command parameter")
+	}
 	if opts.Bool("help") {
 		printUsage(optDescs)
 		os.Exit(0)
@@ -83,10 +86,6 @@ func main() {
 		}
 		printUsage(optDescs)
 		os.Exit(0)
-	}
-
-	if len(args) == 0 {
-		fatal("missing command parameter")
 	}
 
 	defaultHost, ok := os.LookupEnv("CHUBC_HOST")
