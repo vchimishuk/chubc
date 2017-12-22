@@ -52,6 +52,7 @@ func printUsage(opts []*opt.Desc) {
 	fmt.Printf("  playlists                list playlists\n")
 	fmt.Printf("  prev                     play previous track\n")
 	fmt.Printf("  rename-playlist FROM TO  rename playlist\n")
+	fmt.Printf("  status                   show server status\n")
 	fmt.Printf("  stop                     stop playback\n")
 	fmt.Printf("\n")
 	fmt.Printf("Options:\n")
@@ -133,6 +134,8 @@ func main() {
 		err = noArgsCmd(c.Prev, args[1:])
 	case "rename-playlist":
 		err = cmdRenamePlaylist(c, args[1:])
+	case "status":
+		err = cmdStatus(c, args[1:])
 	case "stop":
 		err = noArgsCmd(c.Stop, args[1:])
 	default:
@@ -222,4 +225,33 @@ func cmdRenamePlaylist(c *chubby.Chubby, args []string) error {
 	}
 
 	return c.RenamePlaylist(args[0], args[1])
+}
+
+func cmdStatus(c *chubby.Chubby, args []string) error {
+	err := checkArgs(args, 0)
+	if err != nil {
+		return err
+	}
+
+	s, err := c.Status()
+	if err != nil {
+		return err
+	}
+
+	if s.State == chubby.StateStopped {
+		fmt.Printf("State: stopped\n")
+	} else {
+		if s.State == chubby.StatePlaying {
+			fmt.Printf("State: playing\n")
+		} else {
+			fmt.Printf("State: paused\n")
+		}
+		fmt.Printf("Playlist name: %s\n", s.Playlist)
+		fmt.Printf("Playlist position: %d\n", s.PlaylistPos+1)
+		fmt.Printf("Track path: %s\n", s.Track)
+		fmt.Printf("Track length: %s\n", s.TrackLen)
+		fmt.Printf("Track position: %s\n", s.TrackPos)
+	}
+
+	return nil
 }
