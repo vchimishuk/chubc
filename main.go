@@ -37,28 +37,61 @@ func fatal(format string, args ...interface{}) {
 }
 
 func printUsage(opts []*opt.Desc) {
-	fmt.Printf("Usage: %s [OPTIONS] COMMAND\n", os.Args[0])
+	fmt.Printf("Usage: %s [OPTIONS] COMMAND [ARG]...\n", os.Args[0])
 	fmt.Printf("Simple Chub noninteractive client.\n")
-	fmt.Printf("\n")
-	fmt.Printf("Commands:\n")
-	fmt.Printf("  create-playlist NAME        create playlist\n")
-	fmt.Printf("  delete-playlist NAME        delete playlist\n")
-	fmt.Printf("  help                        show this help\n")
-	fmt.Printf("  kill                        kill server\n")
-	fmt.Printf("  list            PATH        list directory contents\n")
-	fmt.Printf("  next                        play next track\n")
-	fmt.Printf("  pause                       toggle pause state\n")
-	fmt.Printf("  ping                        ping server\n")
-	fmt.Printf("  play            PATH        play path\n")
-	fmt.Printf("  playlists                   list playlists\n")
-	fmt.Printf("  prev                        play previous track\n")
-	fmt.Printf("  rename-playlist FROM TO     rename playlist\n")
-	fmt.Printf("  seek            TIME [REL]  seek playback time\n")
-	fmt.Printf("  status                      show server status\n")
-	fmt.Printf("  stop                        stop playback\n")
 	fmt.Printf("\n")
 	fmt.Printf("Options:\n")
 	fmt.Printf("%s", opt.Usage(opts))
+	fmt.Printf("\n")
+	fmt.Printf("Commands:\n")
+	fmt.Printf("  create-playlist NAME\n")
+	fmt.Printf("    Create playlist with the name specified by NAME parameter.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  delete-playlist NAME       delete playlist\n")
+	fmt.Printf("    Delete existing playlist with the name specified by NAME parameter.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  help\n")
+	fmt.Printf("    Show this help.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  kill\n")
+	fmt.Printf("    Kill Chub server.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  list PATH\n")
+	fmt.Printf("    List VFS directory's contents.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  next\n")
+	fmt.Printf("    Move playback to the next track in the current playlist.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  pause\n")
+	fmt.Printf("    Toggle pause: pause if currently playin or resume pause if any.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  ping\n")
+	fmt.Printf("    Ping server. Ping does nothing just verifies that server can be connected\n")
+	fmt.Printf("    and accepts requests successfuly.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  play PATH\n")
+	fmt.Printf("    Start playing track or directory specified by VFS PATH parameter.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  playlists\n")
+	fmt.Printf("    Print list of existing playlists.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  prev\n")
+	fmt.Printf("    Move playback to the previous track in the current playlist.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  rename-playlist FROM TO\n")
+	fmt.Printf("    Rename playlist specified by FROM parameter to new name TO.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  seek [-|+]TIME\n")
+	fmt.Printf("    Seek playback time. TIME parameter must be provided using common\n")
+	fmt.Printf("    time format: [[HH:]MM:]SS. In this case TIME is used as an absolute\n")
+	fmt.Printf("    track time offset. If - prefix is specified TIME parameter is treated\n")
+	fmt.Printf("    as an interval for rewind. + prefix enables fast-forward mode instead.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  status\n")
+	fmt.Printf("    Print player's current status like current track, time, etc.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  stop\n")
+	fmt.Printf("    Stop playback.\n")
 }
 
 func main() {
@@ -75,17 +108,14 @@ func main() {
 		fatal("invalid parameters: %s", err)
 	}
 
-	if len(args) == 0 {
-		fatal("missing command parameter")
-	}
-	if opts.Bool("help") {
+	help := opts.Bool("help")
+	if help {
 		printUsage(optDescs)
 		os.Exit(0)
-	} else if args[0] == "help" {
-		err = checkArgs(args, 1)
-		if err != nil {
-			fatal("%s", err)
-		}
+	}
+
+	err = checkArgs(args, 1)
+	if err != nil || args[0] == "help" {
 		printUsage(optDescs)
 		os.Exit(0)
 	}
@@ -236,22 +266,25 @@ func cmdSeek(c *chubby.CmdClient, args []string) error {
 		return err
 	}
 
-	var t string
-	var rel bool
-	if args[0][0] == '-' || args[0][0] == '+' {
-		t = args[0][1:]
-		rel = true
+	var st string
+	var mod chubby.SeekMode
+	if args[0][0] == '-' {
+		st = args[0][1:]
+		mod = chubby.SeekModeRewind
+	} else if args[0][0] == '+' {
+		st = args[0][1:]
+		mod = chubby.SeekModeForward
 	} else {
-		t = args[0]
-		rel = false
+		st = args[0]
+		mod = chubby.SeekModeAbs
 	}
 
-	time, err := time.Parse(t)
+	t, err := time.Parse(st)
 	if err != nil {
 		return errors.New("invalid time format")
 	}
 
-	return c.Seek(time, rel)
+	return c.Seek(t, mod)
 }
 
 func cmdStatus(c *chubby.CmdClient, args []string) error {
