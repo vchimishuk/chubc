@@ -2,18 +2,18 @@
 //
 // This file is part of chubc.
 //
-// Chub is free software: you can redistribute it and/or modify
+// Chubc is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Chub is distributed in the hope that it will be useful,
+// Chubc is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Chub. If not, see <http://www.gnu.org/licenses/>.
+// along with Chubc. If not, see <http://www.gnu.org/licenses/>.
 
 package main
 
@@ -26,6 +26,7 @@ import (
 	"strconv"
 
 	"github.com/vchimishuk/chubby"
+	"github.com/vchimishuk/chubby/time"
 	"github.com/vchimishuk/opt"
 )
 
@@ -40,20 +41,21 @@ func printUsage(opts []*opt.Desc) {
 	fmt.Printf("Simple Chub noninteractive client.\n")
 	fmt.Printf("\n")
 	fmt.Printf("Commands:\n")
-	fmt.Printf("  create-playlist NAME     create playlist\n")
-	fmt.Printf("  delete-playlist NAME     delete playlist\n")
-	fmt.Printf("  help                     show this help\n")
-	fmt.Printf("  kill                     kill server\n")
-	fmt.Printf("  list            PATH     list directory contents\n")
-	fmt.Printf("  next                     play next track\n")
-	fmt.Printf("  pause                    toggle pause state\n")
-	fmt.Printf("  ping                     ping server\n")
-	fmt.Printf("  play            PATH     play path\n")
-	fmt.Printf("  playlists                list playlists\n")
-	fmt.Printf("  prev                     play previous track\n")
-	fmt.Printf("  rename-playlist FROM TO  rename playlist\n")
-	fmt.Printf("  status                   show server status\n")
-	fmt.Printf("  stop                     stop playback\n")
+	fmt.Printf("  create-playlist NAME        create playlist\n")
+	fmt.Printf("  delete-playlist NAME        delete playlist\n")
+	fmt.Printf("  help                        show this help\n")
+	fmt.Printf("  kill                        kill server\n")
+	fmt.Printf("  list            PATH        list directory contents\n")
+	fmt.Printf("  next                        play next track\n")
+	fmt.Printf("  pause                       toggle pause state\n")
+	fmt.Printf("  ping                        ping server\n")
+	fmt.Printf("  play            PATH        play path\n")
+	fmt.Printf("  playlists                   list playlists\n")
+	fmt.Printf("  prev                        play previous track\n")
+	fmt.Printf("  rename-playlist FROM TO     rename playlist\n")
+	fmt.Printf("  seek            TIME [REL]  seek playback time\n")
+	fmt.Printf("  status                      show server status\n")
+	fmt.Printf("  stop                        stop playback\n")
 	fmt.Printf("\n")
 	fmt.Printf("Options:\n")
 	fmt.Printf("%s", opt.Usage(opts))
@@ -102,7 +104,7 @@ func main() {
 		fatal("invalid port number: %s", defaultPortStr)
 	}
 	port := opts.IntOr("port", defaultPort)
-	c := &chubby.Chubby{}
+	c := &chubby.CmdClient{}
 
 	err = c.Connect(host, port)
 	if err != nil {
@@ -133,6 +135,8 @@ func main() {
 		err = noArgsCmd(c.Prev, args[1:])
 	case "rename-playlist":
 		err = cmdRenamePlaylist(c, args[1:])
+	case "seek":
+		err = cmdSeek(c, args[1:])
 	case "status":
 		err = cmdStatus(c, args[1:])
 	case "stop":
@@ -173,7 +177,7 @@ func oneArgCmd(cmd func(string) error, args []string) error {
 	return cmd(args[0])
 }
 
-func cmdList(c *chubby.Chubby, args []string) error {
+func cmdList(c *chubby.CmdClient, args []string) error {
 	err := checkArgs(args, 1)
 	if err != nil {
 		return err
@@ -196,7 +200,7 @@ func cmdList(c *chubby.Chubby, args []string) error {
 	return nil
 }
 
-func cmdPlaylists(c *chubby.Chubby, args []string) error {
+func cmdPlaylists(c *chubby.CmdClient, args []string) error {
 	err := checkArgs(args, 0)
 	if err != nil {
 		return err
@@ -217,7 +221,7 @@ func cmdPlaylists(c *chubby.Chubby, args []string) error {
 	return nil
 }
 
-func cmdRenamePlaylist(c *chubby.Chubby, args []string) error {
+func cmdRenamePlaylist(c *chubby.CmdClient, args []string) error {
 	err := checkArgs(args, 2)
 	if err != nil {
 		return err
@@ -226,7 +230,31 @@ func cmdRenamePlaylist(c *chubby.Chubby, args []string) error {
 	return c.RenamePlaylist(args[0], args[1])
 }
 
-func cmdStatus(c *chubby.Chubby, args []string) error {
+func cmdSeek(c *chubby.CmdClient, args []string) error {
+	err := checkArgs(args, 1)
+	if err != nil {
+		return err
+	}
+
+	var t string
+	var rel bool
+	if args[0][0] == '-' || args[0][0] == '+' {
+		t = args[0][1:]
+		rel = true
+	} else {
+		t = args[0]
+		rel = false
+	}
+
+	time, err := time.Parse(t)
+	if err != nil {
+		return errors.New("invalid time format")
+	}
+
+	return c.Seek(time, rel)
+}
+
+func cmdStatus(c *chubby.CmdClient, args []string) error {
 	err := checkArgs(args, 0)
 	if err != nil {
 		return err
@@ -245,9 +273,9 @@ func cmdStatus(c *chubby.Chubby, args []string) error {
 		} else {
 			fmt.Printf("State: paused\n")
 		}
-		fmt.Printf("Playlist name: %s\n", s.Playlist)
+		fmt.Printf("Playlist name: %s\n", s.Playlist.Name)
 		fmt.Printf("Playlist position: %d\n", s.PlaylistPos+1)
-		fmt.Printf("Track path: %s\n", s.Track)
+		fmt.Printf("Track path: %s\n", s.Track.Path)
 		fmt.Printf("Track length: %s\n", s.TrackLen)
 		fmt.Printf("Track position: %s\n", s.TrackPos)
 	}
