@@ -113,9 +113,7 @@ func main() {
 		printUsage(optDescs)
 		os.Exit(0)
 	}
-
-	err = checkArgs(args, 1)
-	if err != nil || args[0] == "help" {
+	if len(args) == 0 || args[0] == "help" {
 		printUsage(optDescs)
 		os.Exit(0)
 	}
