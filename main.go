@@ -47,7 +47,7 @@ func printUsage(opts []*opt.Desc) {
 	fmt.Printf("  create-playlist NAME\n")
 	fmt.Printf("    Create playlist with the name specified by NAME parameter.\n")
 	fmt.Printf("\n")
-	fmt.Printf("  delete-playlist NAME       delete playlist\n")
+	fmt.Printf("  delete-playlist NAME\n")
 	fmt.Printf("    Delete existing playlist with the name specified by NAME parameter.\n")
 	fmt.Printf("\n")
 	fmt.Printf("  help\n")
