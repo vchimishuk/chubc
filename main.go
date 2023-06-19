@@ -132,7 +132,7 @@ func main() {
 		fatal("invalid port number: %s", defaultPortStr)
 	}
 	port := opts.IntOr("port", defaultPort)
-	c := &chubby.CmdClient{}
+	c := &chubby.Chubby{}
 
 	err = c.Connect(host, port)
 	if err != nil {
@@ -205,7 +205,7 @@ func oneArgCmd(cmd func(string) error, args []string) error {
 	return cmd(args[0])
 }
 
-func cmdList(c *chubby.CmdClient, args []string) error {
+func cmdList(c *chubby.Chubby, args []string) error {
 	err := checkArgs(args, 1)
 	if err != nil {
 		return err
@@ -228,7 +228,7 @@ func cmdList(c *chubby.CmdClient, args []string) error {
 	return nil
 }
 
-func cmdPlaylists(c *chubby.CmdClient, args []string) error {
+func cmdPlaylists(c *chubby.Chubby, args []string) error {
 	err := checkArgs(args, 0)
 	if err != nil {
 		return err
@@ -249,7 +249,7 @@ func cmdPlaylists(c *chubby.CmdClient, args []string) error {
 	return nil
 }
 
-func cmdRenamePlaylist(c *chubby.CmdClient, args []string) error {
+func cmdRenamePlaylist(c *chubby.Chubby, args []string) error {
 	err := checkArgs(args, 2)
 	if err != nil {
 		return err
@@ -258,7 +258,7 @@ func cmdRenamePlaylist(c *chubby.CmdClient, args []string) error {
 	return c.RenamePlaylist(args[0], args[1])
 }
 
-func cmdSeek(c *chubby.CmdClient, args []string) error {
+func cmdSeek(c *chubby.Chubby, args []string) error {
 	err := checkArgs(args, 1)
 	if err != nil {
 		return err
@@ -285,7 +285,7 @@ func cmdSeek(c *chubby.CmdClient, args []string) error {
 	return c.Seek(t, mod)
 }
 
-func cmdStatus(c *chubby.CmdClient, args []string) error {
+func cmdStatus(c *chubby.Chubby, args []string) error {
 	err := checkArgs(args, 0)
 	if err != nil {
 		return err
