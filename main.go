@@ -50,6 +50,9 @@ func printUsage(opts []*opt.Desc) {
 	fmt.Printf("  delete-playlist NAME\n")
 	fmt.Printf("    Delete existing playlist with the name specified by NAME parameter.\n")
 	fmt.Printf("\n")
+	fmt.Printf("  events\n")
+	fmt.Printf("    Listen for events and print them to stdout.\n")
+	fmt.Printf("\n")
 	fmt.Printf("  help\n")
 	fmt.Printf("    Show this help.\n")
 	fmt.Printf("\n")
@@ -141,10 +144,12 @@ func main() {
 	defer c.Close()
 
 	switch args[0] {
-	case "delete-playlist":
-		err = oneArgCmd(c.DeletePlaylist, args[1:])
 	case "create-playlist":
 		err = oneArgCmd(c.CreatePlaylist, args[1:])
+	case "delete-playlist":
+		err = oneArgCmd(c.DeletePlaylist, args[1:])
+	case "events":
+		err = cmdEvents(c)
 	case "kill":
 		err = noArgsCmd(c.Kill, args[1:])
 	case "list":
@@ -175,6 +180,8 @@ func main() {
 	if err != nil {
 		fatal("%s", err)
 	}
+
+	os.Exit(0)
 }
 
 func checkArgs(args []string, expected int) error {
@@ -312,4 +319,20 @@ func cmdStatus(c *chubby.Chubby, args []string) error {
 	}
 
 	return nil
+}
+
+func cmdEvents(c *chubby.Chubby) error {
+	ch, err := c.Events(true)
+	if err != nil {
+		return err
+	}
+
+	for {
+		e := <-ch
+		if e == nil {
+			return nil
+		}
+
+		fmt.Printf("%s %s\n", e.Event(), e.Serialize())
+	}
 }
