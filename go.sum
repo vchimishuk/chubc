@@ -1,4 +1,6 @@
 github.com/vchimishuk/chubby v0.0.0-20230619192021-e524618eefad h1:c633zro5qF9Tfx/zOJoCXYC3w5vDCFf+XmyNd9TKirg=
 github.com/vchimishuk/chubby v0.0.0-20230619192021-e524618eefad/go.mod h1:WG3U84IdkwKpNaYrc0bXm1SRH/XRbP5DvIOwXvW3XZg=
+github.com/vchimishuk/chubby v0.0.0-20230708203843-f7ab3db3dd83 h1:ucAII9ohUWVH/OvkG4zFeBcpEfHmdfqOVIxvZl7+Vss=
+github.com/vchimishuk/chubby v0.0.0-20230708203843-f7ab3db3dd83/go.mod h1:WG3U84IdkwKpNaYrc0bXm1SRH/XRbP5DvIOwXvW3XZg=
 github.com/vchimishuk/opt v0.0.0-20160918213041-e09d5e511662 h1:lfnqx9S4HdQgBI2bcBvo5736IA2+2nGMT8z2JrIKy50=
 github.com/vchimishuk/opt v0.0.0-20160918213041-e09d5e511662/go.mod h1:nas1Wr+WMtxTzFZ5h/Sotm1LIcrEdzjvAp7tl3782Ng=
