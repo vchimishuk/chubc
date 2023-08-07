@@ -313,9 +313,16 @@ func cmdStatus(c *chubby.Chubby, args []string) error {
 		}
 		fmt.Printf("Playlist name: %s\n", s.Playlist.Name)
 		fmt.Printf("Playlist position: %d\n", s.PlaylistPos+1)
+		fmt.Printf("Playlist length: %d\n", s.Playlist.Length)
+		fmt.Printf("Playlist duration: %s\n", s.Playlist.Duration)
 		fmt.Printf("Track path: %s\n", s.Track.Path)
-		fmt.Printf("Track length: %s\n", s.TrackLen)
+		fmt.Printf("Track duration: %s\n", s.Track.Length)
 		fmt.Printf("Track position: %s\n", s.TrackPos)
+		fmt.Printf("Track artist: %s\n", s.Track.Artist)
+		fmt.Printf("Track album: %s\n", s.Track.Album)
+		fmt.Printf("Track title: %s\n", s.Track.Title)
+		fmt.Printf("Track year: %d\n", s.Track.Year)
+		fmt.Printf("Track number: %d\n", s.Track.Number)
 	}
 
 	return nil
