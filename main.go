@@ -1,4 +1,4 @@
-// Copyright 2017 Viacheslav Chimishuk <vchimishuk@yandex.ru>
+// Copyright 2017-2024 Viacheslav Chimishuk <vchimishuk@yandex.ru>
 //
 // This file is part of chubc.
 //
@@ -95,6 +95,11 @@ func printUsage(opts []*opt.Desc) {
 	fmt.Printf("\n")
 	fmt.Printf("  stop\n")
 	fmt.Printf("    Stop playback.\n")
+	fmt.Printf("\n")
+	fmt.Printf("  volume [-|+]VOLUME\n")
+	fmt.Printf("    Set playback volume. By default required VOLUME parameter specifies\n")
+	fmt.Printf("    volume value in 0..100 range, however optional - or + sign can be\n")
+	fmt.Printf("    specified to provide relative value instead of absolute.\n")
 }
 
 func main() {
@@ -174,6 +179,8 @@ func main() {
 		err = cmdStatus(c, args[1:])
 	case "stop":
 		err = noArgsCmd(c.Stop, args[1:])
+	case "volume":
+		err = cmdVolume(c, args[1:])
 	default:
 		err = fmt.Errorf("'%s' is not a valid command", args[0])
 	}
@@ -342,4 +349,35 @@ func cmdEvents(c *chubby.Chubby) error {
 
 		fmt.Printf("%s %s\n", e.Event(), e.Serialize())
 	}
+}
+
+func cmdVolume(c *chubby.Chubby, args []string) error {
+	err := checkArgs(args, 1)
+	if err != nil {
+		return err
+	}
+
+	var vols string = args[0]
+	var vol int
+	var mode chubby.VolumeMode = chubby.VolumeModeAbs
+	if vols[0] == '-' || vols[0] == '+' {
+		mode = chubby.VolumeModeRel
+		vol, err = strconv.Atoi(vols)
+		if err != nil {
+			return err
+		}
+		if vol < -100 || vol > 100 {
+			return errors.New("volume out of range")
+		}
+	} else {
+		vol, err = strconv.Atoi(vols)
+		if err != nil {
+			return err
+		}
+		if vol < 0 || vol > 100 {
+			return errors.New("volume out of range")
+		}
+	}
+
+	return c.Volume(vol, mode)
 }
