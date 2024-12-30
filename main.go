@@ -310,14 +310,9 @@ func cmdStatus(c *chubby.Chubby, args []string) error {
 		return err
 	}
 
-	if s.State == chubby.StateStopped {
-		fmt.Printf("State: stopped\n")
-	} else {
-		if s.State == chubby.StatePlaying {
-			fmt.Printf("State: playing\n")
-		} else {
-			fmt.Printf("State: paused\n")
-		}
+	fmt.Printf("State: %s\n", s.State)
+	fmt.Printf("Volume: %d\n", s.Volume)
+	if s.State != chubby.StateStopped {
 		fmt.Printf("Playlist name: %s\n", s.Playlist.Name)
 		fmt.Printf("Playlist position: %d\n", s.PlaylistPos+1)
 		fmt.Printf("Playlist length: %d\n", s.Playlist.Length)
