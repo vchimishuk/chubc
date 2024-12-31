@@ -38,7 +38,7 @@ func fatal(format string, args ...interface{}) {
 
 func printUsage(opts []*opt.Desc) {
 	fmt.Printf("Usage: %s [OPTIONS] COMMAND [ARG]...\n", os.Args[0])
-	fmt.Printf("Simple Chub noninteractive client.\n")
+	fmt.Printf("Simple Chub non-interactive client.\n")
 	fmt.Printf("\n")
 	fmt.Printf("Options:\n")
 	fmt.Printf("%s", opt.Usage(opts))
