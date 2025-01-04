@@ -1,0 +1,126 @@
+.Dd January 4, 2025
+.Dt CHUBC 1
+.Os
+.Sh NAME
+.Nm chubc
+.Nd a simple
+.Xr chub 1
+non-interactive client
+.Sh SYNOPSIS
+.Bk -words
+.Bl -tag -width chubc
+.It Nm
+.Op Fl h Ar host | Fl --host Ar host
+.Op Fl p Ar port | Fl --port Ar port
+.Ar command
+.El
+.Ek
+.Sh DESCRIPTION
+chubc is a non-interactive command line client for
+.Xr chub 1
+audio player. It can be used by user to control
+.Xr chub 1
+as well as in shell scripts.
+.Sh OPTIONS
+The following options are supported by
+.Nm :
+.Bl -tag -width indent
+.It Fl h Ar host , Fl --host Ar host
+If this option is specified
+.Nm
+use provided host argument as a remote server hostname to connect to. Otherwise
+.Ev CHUBC_HOST
+environment variable is used to establish connection to. If both are
+not defined localhost is used as a default value for connection.
+.It Fl p Ar port , Fl --port Ar port
+If this option is specified
+.Nm
+use provided port argument as a
+.Xr chub 1
+server TCP port to connect to. Otherwise
+.Ev CHUBC_PORT
+environment variable is used. If both are not defined 5115 is used as a default
+port value.
+.It Fl -help
+Print brief help information and exit.
+.El
+.Sh COMMANDS
+The commands are supported by
+.Nm :
+.Bl -tag -width create-playlist
+.It Cm create-playlist Ar name
+Create playlist with the name specified by
+.Ar name
+parameter.
+.It Cm delete-playlist Ar name
+Delete existing playlist with the name specified by
+.Ar name
+parameter.
+.It Cm events
+Listen for events and print them to stdout.
+.It Cm help
+Print brief help information and exit.
+.It Cm kill
+Ask
+.Xr chub 1
+server to exit.
+.It Cm list Ar path
+List directory contents.
+.It Cm next
+Move playback to the next track in the current playlist.
+.It Cm pause
+Toggle pause: pause if currently is playing or resume playback if paused.
+.It Cm ping
+Ping
+.Xr chub 1
+server. Ping does nothing just verifies that server can be connected and accepts
+requests successfully.
+.It Cm play Ar path
+Start playing track or directory specified by VFS
+.Ar path
+parameter.
+.It Cm playlists
+Print list of existing playlists.
+.It Cm prev
+Move playback to the previous track in the current playlist.
+.It Cm rename-playlist Ar from Ar to
+Rename playlist specified by
+.Ar from
+parameter to new name
+.Ar to
+.It Cm seek Ar [-|+][[hh:]mm:]ss
+Seek playback time. If provided time argument starts with - or + sign it is
+treated as relative time to seek playback forwards or backwards (depends on the
+sign). Otherwise argument is considered to be absolute time to start playback
+at.
+.It Cm status
+Print
+.Xr chub 1
+current status like currently playing track information, time, volume, and so
+on.
+.It Cm stop
+Stop playback.
+.It Cm volume Ar [-|+]volume
+Set playback volume. By default required
+.Ar volume
+parameter specifies volume value in 0..100 range, however optional - or + sign
+can be specified to provide relative value instead of absolute.
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width CHUBC_HOST
+.It CHUBC_HOST
+Specify
+.Xr chub 1
+hostname to connect to.
+.It CHUBC_PORT
+Specify
+.Xr chub 1
+TCP port to connect to.
+.El
+.Sh EXAMPLES
+Start playing tracks in the directory.
+.Bd -literal -offset indent
+$ chubc play "/ZZ Top/1999 - XXX"
+.Ed
+.Sh AUTHORS
+.An Viacheslav Chimishuk Aq vchimishuk@yandex.ru
