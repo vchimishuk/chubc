@@ -14,11 +14,15 @@ USES=		go:1.21,modules
 USE_GITHUB=	yes
 GH_ACCOUNT=	vchimishuk
 GH_PROJECT=	chubc
-GH_TAGNAME=	b04d0b5
+GH_TAGNAME=	7fcf3b3
 # $ make gomod-vendor
 GH_TUPLE=	vchimishuk:chubby:edf89263defb:vchimishuk_chubby/vendor/github.com/vchimishuk/chubby \
 		vchimishuk:opt:e09d5e511662:vchimishuk_opt/vendor/github.com/vchimishuk/opt
 
-PLIST_FILES=	bin/chubc
+PLIST_FILES=	bin/chubc \
+		share/man/man1/chubc.1.gz
+
+post-install:
+	${INSTALL_MAN} ${WRKSRC}/chubc.1 ${STAGEDIR}${PREFIX}/share/man/man1
 
 .include <bsd.port.mk>
