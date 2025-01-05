@@ -14,6 +14,7 @@ The app can build using standard `go` command.
 $ go build
 $ ./chubc
 ```
+It is also possible to easily build a package for some operation systems. See `dist` folder in the current source distribution.
 
 ### Configuration
 `chubc` does not require any specific configuration. The only configuration knob available is [Chub](https://github.com/vchimishuk/chub) server host & port target to connect to. See `man chubc` or `chub --help` for details.
