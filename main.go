@@ -94,7 +94,7 @@ func main() {
 		fatal("invalid parameters: %s", err)
 	}
 
-	help := opts.Bool("help")
+	help := opts.Has("help")
 	if help {
 		printUsage(optDescs)
 		os.Exit(0)
@@ -260,7 +260,7 @@ func cmdSeek(c *chubby.Chubby, args []string) error {
 	var mod chubby.SeekMode
 	if args[0][0] == '-' {
 		st = args[0][1:]
-		mod = chubby.SeekModeRewind
+		mod = chubby.SeekModeBackward
 	} else if args[0][0] == '+' {
 		st = args[0][1:]
 		mod = chubby.SeekModeForward
