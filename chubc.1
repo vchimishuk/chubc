@@ -10,8 +10,8 @@ non-interactive client
 .Bk -words
 .Bl -tag -width chubc
 .It Nm
-.Op Fl h Ar host | Fl --host Ar host
-.Op Fl p Ar port | Fl --port Ar port
+.Op Fl h Ar host | Fl -host Ar host
+.Op Fl p Ar port | Fl -port Ar port
 .Ar command
 .El
 .Ek
@@ -25,14 +25,14 @@ as well as in shell scripts.
 The following options are supported by
 .Nm :
 .Bl -tag -width indent
-.It Fl h Ar host , Fl --host Ar host
+.It Fl h Ar host , Fl -host Ar host
 If this option is specified
 .Nm
 use provided host argument as a remote server hostname to connect to. Otherwise
 .Ev CHUBC_HOST
 environment variable is used to establish connection to. If both are
 not defined localhost is used as a default value for connection.
-.It Fl p Ar port , Fl --port Ar port
+.It Fl p Ar port , Fl -port Ar port
 If this option is specified
 .Nm
 use provided port argument as a
@@ -108,11 +108,11 @@ can be specified to provide relative value instead of absolute.
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width CHUBC_HOST
-.It CHUBC_HOST
+.It Ev CHUBC_HOST
 Specify
 .Xr chub 1
 hostname to connect to.
-.It CHUBC_PORT
+.It Ev CHUBC_PORT
 Specify
 .Xr chub 1
 TCP port to connect to.

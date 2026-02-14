@@ -9,7 +9,7 @@ $ chubc stop
 ```
 
 ### Build and run
-The app can build using standard `go` command.
+The app can be built using standard `go` command.
 ```
 $ go build
 $ ./chubc
