@@ -6,3 +6,5 @@ github.com/vchimishuk/opt v0.0.0-20160918213041-e09d5e511662 h1:lfnqx9S4HdQgBI2b
 github.com/vchimishuk/opt v0.0.0-20160918213041-e09d5e511662/go.mod h1:nas1Wr+WMtxTzFZ5h/Sotm1LIcrEdzjvAp7tl3782Ng=
 github.com/vchimishuk/opt v0.0.0-20250103221129-d823c9050e21 h1:rvN8vzumjvhKfg+Krs5X+/K78/rV+xV87xDPxvHl3Kk=
 github.com/vchimishuk/opt v0.0.0-20250103221129-d823c9050e21/go.mod h1:MW7wx9OaqU0whuX3WqVLl5i08bNC4VrYQJbJHNrWqL4=
+github.com/vchimishuk/opt v0.0.0-20260329220500-a8e398f12069 h1:ifmkC5qnMFL55QTmeDNBfOoOWoGgTfzKMkjpzAwvpm8=
+github.com/vchimishuk/opt v0.0.0-20260329220500-a8e398f12069/go.mod h1:MW7wx9OaqU0whuX3WqVLl5i08bNC4VrYQJbJHNrWqL4=

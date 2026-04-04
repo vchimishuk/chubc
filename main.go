@@ -18,26 +18,57 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"path"
-	"sort"
+	"slices"
 	"strconv"
 
 	"github.com/vchimishuk/chubby"
-	"github.com/vchimishuk/chubby/time"
 	"github.com/vchimishuk/opt"
 )
 
+var Commands []Command = []Command{
+	NewCreatePlaylistCommand(),
+	NewDeletePlaylistCommand(),
+	NewEventsCommand(),
+	NewKillCommand(),
+	NewListCommand(),
+	NewNextCommand(),
+	NewPauseCommand(),
+	NewPingCommand(),
+	NewPlayCommand(),
+	NewPlaylistsCommand(),
+	NewPrevCommand(),
+	NewRenamePlaylistCommand(),
+	NewSeekCommand(),
+	NewStatusCommand(),
+	NewStopCommand(),
+	NewVolumeCommand(),
+}
+
+func command(name string) Command {
+	i := slices.IndexFunc(Commands, func(c Command) bool {
+		return c.Name() == name
+	})
+	if i == -1 {
+		return nil
+	}
+
+	return Commands[i]
+}
+
+func prog() string {
+	return os.Args[0]
+}
+
 func fatal(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	fmt.Fprintf(os.Stderr, "%s: %s\n", os.Args[0], msg)
+	fmt.Fprintf(os.Stderr, "%s: %s\n", prog(), msg)
 	os.Exit(1)
 }
 
 func printUsage(opts []*opt.Desc) {
-	fmt.Printf("Usage: %s [OPTIONS] COMMAND [ARG]...\n", os.Args[0])
+	fmt.Printf("Usage: %s [OPTIONS] COMMAND [ARG]...\n", prog())
 	fmt.Printf("Simple Chub non-interactive client.\n")
 	fmt.Printf("\n")
 	fmt.Printf("Options:\n")
@@ -80,6 +111,24 @@ func printUsage(opts []*opt.Desc) {
 	fmt.Printf("Set playback volume.\n")
 }
 
+func printCommandUsage(cmd Command) {
+	opts := ""
+	if len(cmd.Options()) != 0 {
+		opts = " [OPTIONS]"
+	}
+	args := ""
+	n, _ := cmd.Args()
+	if n > 0 {
+		args = " [ARG]..."
+	}
+	fmt.Printf("Usage: %s %s%s%s\n", prog(), cmd.Name(), opts, args)
+	if opts != "" {
+		fmt.Printf("\n")
+		fmt.Printf("Options:\n")
+		fmt.Printf("%s", opt.Usage(cmd.Options()))
+	}
+}
+
 func main() {
 	optDescs := []*opt.Desc{
 		{"h", "host", opt.ArgString, "HOST",
@@ -89,7 +138,7 @@ func main() {
 		{"p", "port", opt.ArgInt, "PORT",
 			"server port"}}
 
-	opts, args, err := opt.Parse(os.Args[1:], optDescs)
+	opts, args, err := opt.Parse(os.Args[1:], optDescs, true)
 	if err != nil {
 		fatal("invalid parameters: %s", err)
 	}
@@ -126,231 +175,23 @@ func main() {
 	}
 	defer c.Close()
 
-	switch args[0] {
-	case "create-playlist":
-		err = oneArgCmd(c.CreatePlaylist, args[1:])
-	case "delete-playlist":
-		err = oneArgCmd(c.DeletePlaylist, args[1:])
-	case "events":
-		err = cmdEvents(c)
-	case "kill":
-		err = noArgsCmd(c.Kill, args[1:])
-	case "list":
-		err = cmdList(c, args[1:])
-	case "next":
-		err = noArgsCmd(c.Next, args[1:])
-	case "pause":
-		err = noArgsCmd(c.Pause, args[1:])
-	case "ping":
-		err = noArgsCmd(c.Ping, args[1:])
-	case "play":
-		err = oneArgCmd(c.Play, args[1:])
-	case "playlists":
-		err = cmdPlaylists(c, args[1:])
-	case "prev":
-		err = noArgsCmd(c.Prev, args[1:])
-	case "rename-playlist":
-		err = cmdRenamePlaylist(c, args[1:])
-	case "seek":
-		err = cmdSeek(c, args[1:])
-	case "status":
-		err = cmdStatus(c, args[1:])
-	case "stop":
-		err = noArgsCmd(c.Stop, args[1:])
-	case "volume":
-		err = cmdVolume(c, args[1:])
-	default:
-		err = fmt.Errorf("'%s' is not a valid command", args[0])
+	cmd := command(args[0])
+	if cmd == nil {
+		printUsage(optDescs)
+		os.Exit(0)
 	}
+
+	opts, args, err = opt.Parse(args[1:], cmd.Options(), false)
+	mina, maxa := cmd.Args()
+	if err != nil || len(args) < mina || len(args) > maxa {
+		printCommandUsage(cmd)
+		os.Exit(1)
+	}
+
+	err = cmd.Exec(c, opts, args)
 	if err != nil {
 		fatal("%s", err)
 	}
 
 	os.Exit(0)
-}
-
-func checkArgs(args []string, expected int) error {
-	if len(args) < expected {
-		return errors.New("not enough arguments")
-	} else if len(args) > expected {
-		return errors.New("too many arguments")
-	} else {
-		return nil
-	}
-}
-
-func noArgsCmd(cmd func() error, args []string) error {
-	err := checkArgs(args, 0)
-	if err != nil {
-		return err
-	}
-
-	return cmd()
-}
-
-func oneArgCmd(cmd func(string) error, args []string) error {
-	err := checkArgs(args, 1)
-	if err != nil {
-		return err
-	}
-
-	return cmd(args[0])
-}
-
-func cmdList(c *chubby.Chubby, args []string) error {
-	err := checkArgs(args, 1)
-	if err != nil {
-		return err
-	}
-
-	entries, err := c.List(args[0])
-	if err != nil {
-		return err
-	}
-	for _, e := range entries {
-		if e.IsDir() {
-			_, name := path.Split(e.Dir().Path)
-			fmt.Printf("%s/\n", name)
-		} else {
-			_, name := path.Split(e.Track().Path)
-			fmt.Printf("%s\n", name)
-		}
-	}
-
-	return nil
-}
-
-func cmdPlaylists(c *chubby.Chubby, args []string) error {
-	err := checkArgs(args, 0)
-	if err != nil {
-		return err
-	}
-
-	plists, err := c.Playlists()
-	if err != nil {
-		return err
-	}
-
-	sort.Slice(plists, func(i, j int) bool {
-		return plists[i].Name < plists[j].Name
-	})
-	for _, pl := range plists {
-		fmt.Printf("%s\n", pl.Name)
-	}
-
-	return nil
-}
-
-func cmdRenamePlaylist(c *chubby.Chubby, args []string) error {
-	err := checkArgs(args, 2)
-	if err != nil {
-		return err
-	}
-
-	return c.RenamePlaylist(args[0], args[1])
-}
-
-func cmdSeek(c *chubby.Chubby, args []string) error {
-	err := checkArgs(args, 1)
-	if err != nil {
-		return err
-	}
-
-	var st string
-	var mod chubby.SeekMode
-	if args[0][0] == '-' {
-		st = args[0][1:]
-		mod = chubby.SeekModeBackward
-	} else if args[0][0] == '+' {
-		st = args[0][1:]
-		mod = chubby.SeekModeForward
-	} else {
-		st = args[0]
-		mod = chubby.SeekModeAbs
-	}
-
-	t, err := time.Parse(st)
-	if err != nil {
-		return errors.New("invalid time format")
-	}
-
-	return c.Seek(t, mod)
-}
-
-func cmdStatus(c *chubby.Chubby, args []string) error {
-	err := checkArgs(args, 0)
-	if err != nil {
-		return err
-	}
-
-	s, err := c.Status()
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("State: %s\n", s.State)
-	fmt.Printf("Volume: %d\n", s.Volume)
-	if s.State != chubby.StateStopped {
-		fmt.Printf("Playlist name: %s\n", s.Playlist.Name)
-		fmt.Printf("Playlist position: %d\n", s.PlaylistPos+1)
-		fmt.Printf("Playlist length: %d\n", s.Playlist.Length)
-		fmt.Printf("Playlist duration: %s\n", s.Playlist.Duration)
-		fmt.Printf("Track path: %s\n", s.Track.Path)
-		fmt.Printf("Track duration: %s\n", s.Track.Length)
-		fmt.Printf("Track position: %s\n", s.TrackPos)
-		fmt.Printf("Track artist: %s\n", s.Track.Artist)
-		fmt.Printf("Track album: %s\n", s.Track.Album)
-		fmt.Printf("Track title: %s\n", s.Track.Title)
-		fmt.Printf("Track year: %d\n", s.Track.Year)
-		fmt.Printf("Track number: %d\n", s.Track.Number)
-	}
-
-	return nil
-}
-
-func cmdEvents(c *chubby.Chubby) error {
-	ch, err := c.Events(true)
-	if err != nil {
-		return err
-	}
-
-	for {
-		e := <-ch
-		if e == nil {
-			return nil
-		}
-
-		fmt.Printf("%s %s\n", e.Event(), e.Serialize())
-	}
-}
-
-func cmdVolume(c *chubby.Chubby, args []string) error {
-	err := checkArgs(args, 1)
-	if err != nil {
-		return err
-	}
-
-	var vols string = args[0]
-	var vol int
-	var mode chubby.VolumeMode = chubby.VolumeModeAbs
-	if vols[0] == '-' || vols[0] == '+' {
-		mode = chubby.VolumeModeRel
-		vol, err = strconv.Atoi(vols)
-		if err != nil {
-			return err
-		}
-		if vol < -100 || vol > 100 {
-			return errors.New("volume out of range")
-		}
-	} else {
-		vol, err = strconv.Atoi(vols)
-		if err != nil {
-			return err
-		}
-		if vol < 0 || vol > 100 {
-			return errors.New("volume out of range")
-		}
-	}
-
-	return c.Volume(vol, mode)
 }

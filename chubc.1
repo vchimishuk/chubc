@@ -48,11 +48,15 @@ Print brief help information and exit.
 The commands are supported by
 .Nm :
 .Bl -tag -width create-playlist
-.It Cm create-playlist Ar name
+.It Xo
+.Cm create-playlist Ar name
+.Xc
 Create playlist with the name specified by
 .Ar name
 parameter.
-.It Cm delete-playlist Ar name
+.It Xo
+.Cm delete-playlist Ar name
+.Xc
 Delete existing playlist with the name specified by
 .Ar name
 parameter.
@@ -64,8 +68,31 @@ Print brief help information and exit.
 Ask
 .Xr chub 1
 server to exit.
-.It Cm list Ar path
+.It Xo
+.Cm list
+.Op Fl f Ar format
+.Ar path
+.Xc
 List directory contents.
+Optional flag
+.Fl f
+specifies format of the list items. Its argument is a format string similar to
+.Xr printf 1
+where format characters are prefixed with `%` character.
+Default format is `%f%/`.
+.Bl -column "Format"
+.It Sy Format Ta Sy Description
+.It Li % Ta Print `%` character
+.It Li / Ta Print `/` character if list item is a directory
+.It Li A Ta Album
+.It Li a Ta Artist
+.It Li f Ta File name
+.It Li l Ta Track length
+.It Li n Ta Track number
+.It Li p Ta Path to the track or directory
+.It Li t Ta Track title
+.It Li y Ta Album year
+.El
 .It Cm next
 Move playback to the next track in the current playlist.
 .It Cm pause
@@ -83,12 +110,16 @@ parameter.
 Print list of existing playlists.
 .It Cm prev
 Move playback to the previous track in the current playlist.
-.It Cm rename-playlist Ar from Ar to
+.It Xo
+.Cm rename-playlist Ar from Ar to
+.Xc
 Rename playlist specified by
 .Ar from
 parameter to new name
 .Ar to
-.It Cm seek Ar [-|+][[hh:]mm:]ss
+.It Xo
+.Cm seek Ar [-|+][[hh:]mm:]ss
+.Xc
 Seek playback time. If provided time argument starts with - or + sign it is
 treated as relative time to seek playback forwards or backwards (depends on the
 sign). Otherwise argument is considered to be absolute time to start playback
@@ -100,7 +131,9 @@ current status like currently playing track information, time, volume, and so
 on.
 .It Cm stop
 Stop playback.
-.It Cm volume Ar [-|+]volume
+.It Xo
+.Cm volume Ar [-|+]volume
+.Xc
 Set playback volume. By default required
 .Ar volume
 parameter specifies volume value in 0..100 range, however optional - or + sign
@@ -121,6 +154,11 @@ TCP port to connect to.
 Start playing tracks in the directory.
 .Bd -literal -offset indent
 $ chubc play "/ZZ Top/1999 - XXX"
+.Ed
+.Pp
+List directory in custom format.
+.Bd -literal -offset indent
+$ chubc list -f "%a - %t" "/ZZ Top/1999 - XXX"
 .Ed
 .Sh AUTHORS
 .An Viacheslav Chimishuk Aq vchimishuk@yandex.ru
