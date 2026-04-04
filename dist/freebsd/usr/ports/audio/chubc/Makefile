@@ -14,10 +14,10 @@ USES=		go:1.21,modules
 USE_GITHUB=	yes
 GH_ACCOUNT=	vchimishuk
 GH_PROJECT=	chubc
-GH_TAGNAME=	7fcf3b3
+GH_TAGNAME=	bfac168
 # $ make gomod-vendor
-GH_TUPLE=	vchimishuk:chubby:edf89263defb:vchimishuk_chubby/vendor/github.com/vchimishuk/chubby \
-		vchimishuk:opt:e09d5e511662:vchimishuk_opt/vendor/github.com/vchimishuk/opt
+GH_TUPLE=	vchimishuk:chubby:5c8291618f1b:vchimishuk_chubby/vendor/github.com/vchimishuk/chubby \
+		vchimishuk:opt:a8e398f12069:vchimishuk_opt/vendor/github.com/vchimishuk/opt
 
 PLIST_FILES=	bin/chubc \
 		share/man/man1/chubc.1.gz

@@ -1,7 +1,7 @@
-TIMESTAMP = 1736023484
-SHA256 (vchimishuk-chubc-0.0.1-7fcf3b3_GH0.tar.gz) = 73eb0d45ea00185e0efea0c100128358648e98a6ef27fb62051124fbddf724a7
-SIZE (vchimishuk-chubc-0.0.1-7fcf3b3_GH0.tar.gz) = 17062
-SHA256 (vchimishuk-chubby-edf89263defb_GH0.tar.gz) = f1c5173f7dd55bf54ba8a62510340316e80041afa3e2268219b16c83bae56986
-SIZE (vchimishuk-chubby-edf89263defb_GH0.tar.gz) = 18253
-SHA256 (vchimishuk-opt-e09d5e511662_GH0.tar.gz) = e3526cefd74d4ec495528c3325b1b24fc702cedb80e5fe32d09b34fe6345b21a
-SIZE (vchimishuk-opt-e09d5e511662_GH0.tar.gz) = 17450
+TIMESTAMP = 1775331676
+SHA256 (vchimishuk-chubc-0.0.1-bfac168_GH0.tar.gz) = a0e5ca84a34b62fb015b700cf32c1cd3deba8babe85bdaaae6d5ddc431609a6b
+SIZE (vchimishuk-chubc-0.0.1-bfac168_GH0.tar.gz) = 19717
+SHA256 (vchimishuk-chubby-5c8291618f1b_GH0.tar.gz) = efc6a4ac7dc6f512c0c7d912a4a82da791c0baf270992df70e9e0c0d9fd78f13
+SIZE (vchimishuk-chubby-5c8291618f1b_GH0.tar.gz) = 18187
+SHA256 (vchimishuk-opt-a8e398f12069_GH0.tar.gz) = fd05285ac160e459cfc14102980225c91260f7235dd6d9a04a4b84e6b8298aa3
+SIZE (vchimishuk-opt-a8e398f12069_GH0.tar.gz) = 17733
