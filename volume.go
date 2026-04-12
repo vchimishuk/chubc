@@ -48,9 +48,11 @@ func (c VolumeCommand) Exec(ch *chubby.Chubby, opts opt.Options, args []string) 
 	var vols string = args[0]
 	var vol int
 	var mode chubby.VolumeMode = chubby.VolumeModeAbs
+	var err error
+
 	if vols[0] == '-' || vols[0] == '+' {
 		mode = chubby.VolumeModeRel
-		vol, err := strconv.Atoi(vols)
+		vol, err = strconv.Atoi(vols)
 		if err != nil {
 			return err
 		}
@@ -58,7 +60,7 @@ func (c VolumeCommand) Exec(ch *chubby.Chubby, opts opt.Options, args []string) 
 			return errors.New("volume out of range")
 		}
 	} else {
-		vol, err := strconv.Atoi(vols)
+		vol, err = strconv.Atoi(vols)
 		if err != nil {
 			return err
 		}
